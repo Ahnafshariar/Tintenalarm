@@ -8,19 +8,55 @@ from prettytable import PrettyTable
 
 start = time.time()
 
-url = 'https://www.tintenalarm.de/10-farbbaender-von-tintenalarm.de-ersetzt-canon-ep-102-4202a002-schwarz-rot-p-28970.html'
 
-response = requests.get(url)
+def get_product_info(url):
+    response = requests.get(url)
 
-soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
-product_title = soup.find('span', attrs={'itemprop': 'name'})
+    product_title = soup.find("h1", {"class": "products_info_name"})
 
-title = product_title.text
+    title = product_title.select('span')[0]
 
-print(title)
+    print(title.text)
 
+    product_image = soup.find("div", {"class": "product-info-bild"})
 
-img_link = soup.a.img['src']
+    image = product_image.select('a[href]')[0].get('href')
 
-print(img_link)
+    image = "https://www.tintenalarm.de/" + image
+
+    print(image)
+
+    manufacturer_div = soup.find('div', {'itemprop': 'manufacturer'})
+
+    manufacturer = manufacturer_div.text.strip()
+
+    print(manufacturer)
+
+    product_price = soup.find('div', {'class': 'product-info-preis'})
+
+    price = product_price.text.strip()
+
+    price = price.split(" ")[0]
+
+    print(price)
+
+    product_feature = soup.findAll('div', {'class': 'products_features_list'})[1]
+
+    product_type = product_feature.select('span')[0].text.strip()
+
+    print(product_type)
+
+    product_feature = soup.findAll('div', {'class': 'products_features_list'})[4]
+
+    # oem = product_feature.select('div')[0].text.split("-")[1]
+
+    oem = product_feature.select('div')[0].text
+
+    print(oem)
+
+    data = str(oem) + "~" + str(manufacturer) + "~" + str(title.text) + "~" + str(product_type) + "~" + str(
+        price) + "~" + str(image)
+
+    return data
