@@ -19,3 +19,8 @@ product_title = soup.find('span', attrs={'itemprop': 'name'})
 title = product_title.text
 
 print(title)
+
+
+img_link = soup.a.img['src']
+
+print(img_link)
